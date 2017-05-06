@@ -13,6 +13,10 @@ if not pygame.mixer: print ('Warning, sound disabled')
 main_dir = os.path.split(os.path.abspath(__file__))[0]
 data_dir = os.path.join(main_dir, 'data')
 
+size = width, height = 820, 440
+speed = [6, 6]
+black = 0, 0, 0
+
 def load_image(name, colorkey=None):
     fullname = os.path.join(data_dir, name)
     try:
@@ -69,21 +73,24 @@ class Ball(pygame.sprite.Sprite):
         screen = pygame.display.get_surface()
         self.area = screen.get_rect()
         self.rect.topleft = 10, 10
-        self.move = 9
+        self.move = speed
         self.dizzy = 0
 
     def update(self):
         if self.dizzy:
             self._spin()
         else:
-            self._walk()
+            self._fall()
 
-    def _walk(self):
-        newpos = self.rect.move((self.move, 0))
-        if self.rect.left < self.area.left or \
-            self.rect.right > self.area.right:
-            self.move = -self.move
-            newpos = self.rect.move((self.move, 0))
+    def _fall(self):
+        newpos = self.rect.move(self.move)
+        if self.rect.left < self.area.left or self.rect.right > self.area.right:
+            speed[0] = -speed[0]
+            newpos = self.rect.move(speed)
+            self.image = pygame.transform.flip(self.image, 1, 0)
+        if self.rect.top < self.area.top or self.rect.bottom > self.area.bottom:
+            speed[1] = -speed[1]
+            newpos = self.rect.move(speed)
             self.image = pygame.transform.flip(self.image, 1, 0)
         self.rect = newpos
 
@@ -106,10 +113,6 @@ class Ball(pygame.sprite.Sprite):
 
 def main():
     pygame.init()
-
-    size = width, height = 820, 440
-    speed = [16, 16]
-    black = 0, 0, 0
 
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption('Volley ball')
@@ -138,10 +141,8 @@ def main():
                print(event)
             if event.type == QUIT:
                 going = False
-            #elif event.type == pygame.KEYDOWN: and event.key == K_q:
-            elif event.type == pygame.KEYDOWN:
-                if event.key == K_q:
-                    going = False
+            elif event.type == KEYDOWN and event.key == K_q:
+                going = False
             elif event.type == MOUSEBUTTONDOWN:
                 if fist.punch(ball):
                     punch_sound.play()
