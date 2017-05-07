@@ -119,17 +119,6 @@ class Ball(pygame.sprite.Sprite):
             self.dizzy = 1
             self.original = self.image
 
-#class Scoreboard(pygame.sprite.Sprite):
-#    def __init__(self):
-#        pygame.sprite.Sprite.__init__(self)
-        #self.score = 0
-        #self.font = pygame.font.SysFont("None", 20)
-
-#    def update(self):
-#        self.text = "Score: %d" % (self.score)
-#        self.image = self.font.render(self.text, 1, (255, 255, 0))
-#        self.rect = self.image.get_rect()
-
 
 def main():
     pygame.init()
@@ -149,8 +138,6 @@ def main():
     punch_sound = load_sound('sounds/spring.wav')
     ball = Ball()
     fist = Fist()
-    #scoreboard = Scoreboard()
-    #allsprites = pygame.sprite.RenderPlain((fist, ball, scoreboard))
     allsprites = pygame.sprite.RenderPlain((fist, ball))
 
     font = pygame.font.Font(None, 36)
@@ -176,17 +163,17 @@ def main():
                 if fist.punch(ball):
                     punch_sound.play()
                     ball.punched()
-                    #scoreboard.score += 1
                     score += 1
             elif event.type == MOUSEBUTTONUP:
                 fist.unpunch()
-            #text = font.render("Score {0}".format(score-1), 1, (255,255,255))
-            #textpos = text.get_rect(centerx = background.get_width()/2)
-            #background.blit(text, textpos)
 
-            #text = font.render("Score {0}".format(score), 1, (0,0,0))
-            #textpos = text.get_rect(centerx = background.get_width()/2)
-            #background.blit(text, textpos)
+            text = font.render("Score {0}".format(score-1), 1, (255,255,255))
+            textpos = text.get_rect(centerx = background.get_width()/2)
+            background.blit(text, textpos)
+
+            text = font.render("Score {0}".format(score), 1, (0,0,0))
+            textpos = text.get_rect(centerx = background.get_width()/2)
+            background.blit(text, textpos)
 
         allsprites.update()
 
