@@ -2,8 +2,7 @@
 
 # fix color of ball so no transparency
 # create a scoreboard class with a rectangle so score can be cleared between each update
-# scoreboard: http://cs.iupui.edu/~aharris/pygame/ch07/mpScore.py
-# https://peak5390.wordpress.com/2013/01/21/balloon-ninja-adding-a-scoreboard/
+# add comments
 
 import os, pygame
 from pygame.locals import *
