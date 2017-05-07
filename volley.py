@@ -3,6 +3,7 @@
 # fix color of ball so no transparency
 # create a scoreboard class with a rectangle so score can be cleared between each update
 # add comments
+# ball can only be punched after it hits a wall
 
 import os, pygame
 from pygame.locals import *
