@@ -1,21 +1,24 @@
 #!/usr/bin/env python
 
-# ball bounces around the screen
-# move the mouse and click on ball
-# on click the ball chanegs direction
+# fix color of ball so no transparency
+# create a scoreboard class with a rectangle so score can be cleared between each update
+# scoreboard: http://cs.iupui.edu/~aharris/pygame/ch07/mpScore.py
+# https://peak5390.wordpress.com/2013/01/21/balloon-ninja-adding-a-scoreboard/
 
 import os, pygame
 from pygame.locals import *
 from pygame.compat import geterror
 
+if not pygame.font: print ('Warning, fonts disabled')
 if not pygame.mixer: print ('Warning, sound disabled')
+
+size = width, height = 440, 440
+speed = [1, 1]
+white = 255, 255, 255
+going = True
 
 main_dir = os.path.split(os.path.abspath(__file__))[0]
 data_dir = os.path.join(main_dir, 'data')
-
-size = width, height = 820, 440
-speed = [6, 6]
-black = 0, 0, 0
 
 def load_image(name, colorkey=None):
     fullname = os.path.join(data_dir, name)
@@ -83,20 +86,23 @@ class Ball(pygame.sprite.Sprite):
             self._fall()
 
     def _fall(self):
+        global going
         newpos = self.rect.move(self.move)
         if self.rect.left < self.area.left or self.rect.right > self.area.right:
             speed[0] = -speed[0]
             newpos = self.rect.move(speed)
             self.image = pygame.transform.flip(self.image, 1, 0)
-        if self.rect.top < self.area.top or self.rect.bottom > self.area.bottom:
+        if self.rect.top < self.area.top:
             speed[1] = -speed[1]
             newpos = self.rect.move(speed)
             self.image = pygame.transform.flip(self.image, 1, 0)
         self.rect = newpos
+        if self.rect.bottom > self.area.bottom:
+            going = False
 
     def _spin(self):
         center = self.rect.center
-        self.dizzy = self.dizzy + 12
+        self.dizzy = self.dizzy + 72
         if self.dizzy >= 360:
             self.dizzy = 0
             self.image = self.original
@@ -106,9 +112,24 @@ class Ball(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=center)
 
     def punched(self):
+        newpos = self.rect.move(self.move)
+        speed[1] = -speed[1] - 1
+        newpos = self.rect.move(speed)
+        self.image = pygame.transform.flip(self.image, 1, 0)
         if not self.dizzy:
             self.dizzy = 1
             self.original = self.image
+
+#class Scoreboard(pygame.sprite.Sprite):
+#    def __init__(self):
+#        pygame.sprite.Sprite.__init__(self)
+        #self.score = 0
+        #self.font = pygame.font.SysFont("None", 20)
+
+#    def update(self):
+#        self.text = "Score: %d" % (self.score)
+#        self.image = self.font.render(self.text, 1, (255, 255, 0))
+#        self.rect = self.image.get_rect()
 
 
 def main():
@@ -120,21 +141,30 @@ def main():
 
     background = pygame.Surface(size)
     background = background.convert()
-    background.fill(black)
+    background.fill(white)
 
     screen.blit(background, (0, 0))
     pygame.display.flip()
 
     clock = pygame.time.Clock()
-    whiff_sound = load_sound('sounds/spring.wav')
-    punch_sound = load_sound('sounds/clang.wav')
+    punch_sound = load_sound('sounds/spring.wav')
     ball = Ball()
     fist = Fist()
+    #scoreboard = Scoreboard()
+    #allsprites = pygame.sprite.RenderPlain((fist, ball, scoreboard))
     allsprites = pygame.sprite.RenderPlain((fist, ball))
 
-    going = True
+    font = pygame.font.Font(None, 36)
+    score = 0
+
+    global going
     while going:
         clock.tick(60)
+
+        #font = pygame.font.Font(None, 36)
+        #text = font.render("Score {0}".format(score), 1, (10,10,10))
+        #textpos = text.get_rect(centerx = background.get_width()/2)
+        #background.blit(text, textpos)
 
         for event in pygame.event.get():
             if event.type != NOEVENT:
@@ -147,10 +177,17 @@ def main():
                 if fist.punch(ball):
                     punch_sound.play()
                     ball.punched()
-                else:
-                    whiff_sound.play()
+                    #scoreboard.score += 1
+                    score += 1
             elif event.type == MOUSEBUTTONUP:
                 fist.unpunch()
+            #text = font.render("Score {0}".format(score-1), 1, (255,255,255))
+            #textpos = text.get_rect(centerx = background.get_width()/2)
+            #background.blit(text, textpos)
+
+            #text = font.render("Score {0}".format(score), 1, (0,0,0))
+            #textpos = text.get_rect(centerx = background.get_width()/2)
+            #background.blit(text, textpos)
 
         allsprites.update()
 
