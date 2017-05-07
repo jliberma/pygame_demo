@@ -4,7 +4,7 @@
 # create a scoreboard class with a rectangle so score can be cleared between each update
 # http://openbookproject.net/thinkcs/python/english3e/pygame.html
 # add comments
-# ball can only be punched after it hits a wall
+# print score when game exits
 
 import os, pygame
 from pygame.locals import *
@@ -79,6 +79,7 @@ class Ball(pygame.sprite.Sprite):
         self.rect.topleft = 10, 10
         self.move = speed
         self.dizzy = 0
+        self.punchy = 0
 
     def update(self):
         if self.dizzy:
@@ -90,16 +91,18 @@ class Ball(pygame.sprite.Sprite):
         global going
         newpos = self.rect.move(self.move)
         if self.rect.left < self.area.left or self.rect.right > self.area.right:
+            self.punchy = 0
             speed[0] = -speed[0]
             newpos = self.rect.move(speed)
             self.image = pygame.transform.flip(self.image, 1, 0)
         if self.rect.top < self.area.top:
+            self.punchy = 0
             speed[1] = -speed[1]
             newpos = self.rect.move(speed)
             self.image = pygame.transform.flip(self.image, 1, 0)
-        self.rect = newpos
-        if self.rect.bottom > self.area.bottom:
+        if self.rect.top > self.area.bottom:
             going = False
+        self.rect = newpos
 
     def _spin(self):
         center = self.rect.center
@@ -113,13 +116,15 @@ class Ball(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=center)
 
     def punched(self):
-        newpos = self.rect.move(self.move)
-        speed[1] = -speed[1] - 1
-        newpos = self.rect.move(speed)
-        self.image = pygame.transform.flip(self.image, 1, 0)
-        if not self.dizzy:
-            self.dizzy = 1
-            self.original = self.image
+        if not self.punchy:
+            self.punchy = 1
+            newpos = self.rect.move(self.move)
+            speed[1] = -speed[1] - 1
+            newpos = self.rect.move(speed)
+            self.image = pygame.transform.flip(self.image, 1, 0)
+            if not self.dizzy:
+                self.dizzy = 1
+                self.original = self.image
 
 
 def main():
@@ -149,11 +154,6 @@ def main():
     while going:
         clock.tick(60)
 
-        #font = pygame.font.Font(None, 36)
-        #text = font.render("Score {0}".format(score), 1, (10,10,10))
-        #textpos = text.get_rect(centerx = background.get_width()/2)
-        #background.blit(text, textpos)
-
         for event in pygame.event.get():
             if event.type != NOEVENT:
                print(event)
@@ -162,7 +162,7 @@ def main():
             elif event.type == KEYDOWN and event.key == K_q:
                 going = False
             elif event.type == MOUSEBUTTONDOWN:
-                if fist.punch(ball):
+                if fist.punch(ball) and ball.punchy == 0:
                     punch_sound.play()
                     ball.punched()
                     score += 1
@@ -176,6 +176,7 @@ def main():
             text = font.render("Score {0}".format(score), 1, (0,0,0))
             textpos = text.get_rect(centerx = background.get_width()/2)
             background.blit(text, textpos)
+
 
         allsprites.update()
 
