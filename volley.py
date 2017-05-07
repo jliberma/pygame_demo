@@ -2,6 +2,7 @@
 
 # fix color of ball so no transparency
 # create a scoreboard class with a rectangle so score can be cleared between each update
+# http://openbookproject.net/thinkcs/python/english3e/pygame.html
 # add comments
 # ball can only be punched after it hits a wall
 
