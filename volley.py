@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
-# create a scoreboard class with a rectangle so score can be cleared between each update
-# http://openbookproject.net/thinkcs/python/english3e/pygame.html
 # add comments from chimp tutorial and other places
+# center the score on the text box
 
 import os, pygame
 from pygame.locals import *
@@ -14,6 +13,7 @@ if not pygame.mixer: print ('Warning, sound disabled')
 size = width, height = 440, 440
 speed = [1, 1]
 white = 255, 255, 255
+black = 0,0,0
 going = True
 
 main_dir = os.path.split(os.path.abspath(__file__))[0]
@@ -124,7 +124,6 @@ class Ball(pygame.sprite.Sprite):
                 self.dizzy = 1
                 self.original = self.image
 
-
 def main():
     pygame.init()
 
@@ -145,7 +144,6 @@ def main():
     fist = Fist()
     allsprites = pygame.sprite.RenderPlain((fist, ball))
 
-    font = pygame.font.Font(None, 36)
     score = 0
 
     global going
@@ -167,16 +165,10 @@ def main():
             elif event.type == MOUSEBUTTONUP:
                 fist.unpunch()
 
-            # this code block overwrites the black score text with a white score text
-            # prior to writing the new score in black
-            text = font.render("Score {0}".format(score-1), 1, (255,255,255))
-            textpos = text.get_rect(centerx = background.get_width()/2)
-            background.blit(text, textpos)
-
-            text = font.render("Score {0}".format(score), 1, (0,0,0))
-            textpos = text.get_rect(centerx = background.get_width()/2)
-            background.blit(text, textpos)
-
+        pygame.draw.rect(background, white, [180, 0, 80, 40])
+        font = pygame.font.Font(None, 32)
+        text = font.render("Score {0}".format(score), True, black)
+        background.blit(text,(180,0))
 
         allsprites.update()
 
@@ -184,7 +176,6 @@ def main():
         allsprites.draw(screen)
         pygame.display.flip()
 
-    print ("Score: %d" % score)
     pygame.quit()
 
 
