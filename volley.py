@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 
-# fix color of ball so no transparency
 # create a scoreboard class with a rectangle so score can be cleared between each update
 # http://openbookproject.net/thinkcs/python/english3e/pygame.html
-# add comments
-# print score when game exits
+# add comments from chimp tutorial and other places
 
 import os, pygame
 from pygame.locals import *
@@ -73,7 +71,7 @@ class Fist(pygame.sprite.Sprite):
 class Ball(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image, self.rect = load_image('images/ball.bmp', -1)
+        self.image, self.rect = load_image('images/ball.gif', -1)
         screen = pygame.display.get_surface()
         self.area = screen.get_rect()
         self.rect.topleft = 10, 10
@@ -155,8 +153,8 @@ def main():
         clock.tick(60)
 
         for event in pygame.event.get():
-            if event.type != NOEVENT:
-               print(event)
+            #if event.type != NOEVENT:
+            #   print(event)
             if event.type == QUIT:
                 going = False
             elif event.type == KEYDOWN and event.key == K_q:
@@ -169,6 +167,8 @@ def main():
             elif event.type == MOUSEBUTTONUP:
                 fist.unpunch()
 
+            # this code block overwrites the black score text with a white score text
+            # prior to writing the new score in black
             text = font.render("Score {0}".format(score-1), 1, (255,255,255))
             textpos = text.get_rect(centerx = background.get_width()/2)
             background.blit(text, textpos)
@@ -184,6 +184,7 @@ def main():
         allsprites.draw(screen)
         pygame.display.flip()
 
+    print ("Score: %d" % score)
     pygame.quit()
 
 
