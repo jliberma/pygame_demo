@@ -2,6 +2,7 @@
 
 # add comments from chimp tutorial and other places
 # center the score on the text box
+# fixed the messed up scoreboard
 
 import os, pygame
 from pygame.locals import *
