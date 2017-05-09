@@ -176,6 +176,8 @@ def main():
         allsprites.draw(screen)
         pygame.display.flip()
 
+    print "Score ", score
+
     pygame.quit()
 
 
