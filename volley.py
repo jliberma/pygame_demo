@@ -1,25 +1,35 @@
 #!/usr/bin/env python
+"""
+This is a simple example of basic pygame
+functionality. The player tries to keep a
+beachball in the air by punching it.
+"""
+# jliberman@utexas.edu
 
-# add comments from chimp tutorial and other places
-# center the score on the text box
-# fixed the messed up scoreboard
-
-import os, pygame
+# import modules
+import os
+import pygame
 from pygame.locals import *
 from pygame.compat import geterror
 
-if not pygame.font: print ('Warning, fonts disabled')
-if not pygame.mixer: print ('Warning, sound disabled')
+# test for optional pygame modules
+if not pygame.font:
+    print ('Warning, fonts disabled')
+if not pygame.mixer:
+    print ('Warning, sound disabled')
 
+# set global variables
 size = width, height = 440, 440
 speed = [1, 1]
 white = 255, 255, 255
-black = 0,0,0
+black = 0, 0, 0
 going = True
 
 main_dir = os.path.split(os.path.abspath(__file__))[0]
 data_dir = os.path.join(main_dir, 'data')
 
+
+# load images
 def load_image(name, colorkey=None):
     fullname = os.path.join(data_dir, name)
     try:
@@ -30,10 +40,12 @@ def load_image(name, colorkey=None):
     image = image.convert()
     if colorkey is not None:
         if colorkey is -1:
-            colorkey = image.get_at((0,0))
+            colorkey = image.get_at((0, 0))
         image.set_colorkey(colorkey, RLEACCEL)
     return image, image.get_rect()
 
+
+# load sounds
 def load_sound(name):
     class NoneSound:
         def play(self): pass
@@ -47,18 +59,23 @@ def load_sound(name):
         raise SystemExit(str(geterror()))
     return sound
 
+
+# class for fist sprite
 class Fist(pygame.sprite.Sprite):
+    # init fist objects
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image, self.rect = load_image('images/fist.bmp', -1)
         self.punching = 0
 
+    # update method run once per frame
     def update(self):
         pos = pygame.mouse.get_pos()
         self.rect.midtop = pos
         if self.punching:
             self.rect.move_ip(5, 10)
 
+    # change object punching state
     def punch(self, target):
         if not self.punching:
             self.punching = 1
@@ -69,6 +86,7 @@ class Fist(pygame.sprite.Sprite):
         self.punching = 0
 
 
+# ball class moves the ball across the screen
 class Ball(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -86,10 +104,12 @@ class Ball(pygame.sprite.Sprite):
         else:
             self._fall()
 
+    # private method reverses direction when ball hits edge or ceiling
     def _fall(self):
         global going
         newpos = self.rect.move(self.move)
-        if self.rect.left < self.area.left or self.rect.right > self.area.right:
+        if self.rect.left < self.area.left or \
+                self.rect.right > self.area.right:
             self.punchy = 0
             speed[0] = -speed[0]
             newpos = self.rect.move(speed)
@@ -114,6 +134,7 @@ class Ball(pygame.sprite.Sprite):
             self.image = rotate(self.original, self.dizzy)
         self.rect = self.image.get_rect(center=center)
 
+    # method disables ball contact until edge or ceiling is touched
     def punched(self):
         if not self.punchy:
             self.punchy = 1
@@ -125,20 +146,25 @@ class Ball(pygame.sprite.Sprite):
                 self.dizzy = 1
                 self.original = self.image
 
+
 def main():
     pygame.init()
 
+    # init screen, caption, and set mouse visible
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption('Volley ball')
     pygame.mouse.set_visible(0)
 
+    # create a background surface the size of the display window
     background = pygame.Surface(size)
     background = background.convert()
     background.fill(white)
 
+    # display the background when setup finishes
     screen.blit(background, (0, 0))
     pygame.display.flip()
 
+    # prepare the game objects
     clock = pygame.time.Clock()
     punch_sound = load_sound('sounds/spring.wav')
     ball = Ball()
@@ -147,13 +173,17 @@ def main():
 
     score = 0
 
+    # global variable used to exit game
     global going
+
+    # main loop
     while going:
         clock.tick(60)
 
+        # handle all input events
         for event in pygame.event.get():
-            #if event.type != NOEVENT:
-            #   print(event)
+            # if event.type != NOEVENT:
+            #    print(event)
             if event.type == QUIT:
                 going = False
             elif event.type == KEYDOWN and event.key == K_q:
@@ -166,21 +196,22 @@ def main():
             elif event.type == MOUSEBUTTONUP:
                 fist.unpunch()
 
+        # update the scoreboard
         pygame.draw.rect(background, white, [170, 0, 100, 40])
         font = pygame.font.Font(None, 32)
         text = font.render("Score {0}".format(score), True, black)
         text_rect = text.get_rect()
-        #text_rect.center = ( (screen.get_width() + text.get_width()/2),
-        #        (screen.get_height() + text.get_height()/2) )
-        background.blit(text,(170,0))
-        #background.blit(text,text_rect)
+        background.blit(text, (170, 0))
 
+        # update all sprites
         allsprites.update()
 
+        # redraw the screen
         screen.blit(background, (0, 0))
         allsprites.draw(screen)
         pygame.display.flip()
 
+    # print the score when game exits
     print "Score ", score
 
     pygame.quit()
@@ -188,3 +219,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
