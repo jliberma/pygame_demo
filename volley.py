@@ -166,10 +166,14 @@ def main():
             elif event.type == MOUSEBUTTONUP:
                 fist.unpunch()
 
-        pygame.draw.rect(background, white, [180, 0, 80, 40])
+        pygame.draw.rect(background, white, [170, 0, 100, 40])
         font = pygame.font.Font(None, 32)
         text = font.render("Score {0}".format(score), True, black)
-        background.blit(text,(180,0))
+        text_rect = text.get_rect()
+        #text_rect.center = ( (screen.get_width() + text.get_width()/2),
+        #        (screen.get_height() + text.get_height()/2) )
+        background.blit(text,(170,0))
+        #background.blit(text,text_rect)
 
         allsprites.update()
 
